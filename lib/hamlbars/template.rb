@@ -27,6 +27,7 @@ module Hamlbars
     # Handy helper to preconfigure Hamlbars to render for
     # either :handlebars (default) or :ember.
     def self.render_templates_for(whom=:handlebars)
+      self.templates_for = whom
       if whom == :handlebars
         self.template_destination = 'Handlebars.templates'
         self.template_compiler = 'Handlebars.compile'
@@ -68,7 +69,15 @@ module Hamlbars
     def self.template_partial_method=(x)
       @template_partial_method = x
     end
-
+    
+    def self.templates_for=(type)
+      @templates_for = type
+    end
+    
+    def self.templates_for
+      @templates_for ||= :handlebars
+    end
+    
     self.default_mime_type = 'application/javascript'
 
     def self.engine_initialized?

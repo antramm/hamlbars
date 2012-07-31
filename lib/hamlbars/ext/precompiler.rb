@@ -12,8 +12,11 @@ module Hamlbars
       # compiler via ExecJS.
       def hb_template_js_with_precompiler(template)
         if self.class.precompiler_enabled? 
-          precompiledTemplate = runtime.call('precompileEmberHandlebars', template)
-          "Handlebars.template(#{precompiledTemplate})"
+          precompileFunction =  case self.class.templates_for
+                                when :ember then 'precompileEmberHandlebars'
+                                else             'Hamlbars.precompile'
+                                end
+          "Handlebars.template(#{runtime.call precompileFunction, template})"
         else
           hb_template_js_without_precompiler(template)
         end
@@ -25,7 +28,10 @@ module Hamlbars
       end
 
       def js
-        [ 'handlebars-1.0.0.beta.6.js', 'headless-ember.js', 'ember-prod.js' ].map do |name|
+        case self.class.templates_for
+        when :ember then  %w{handlebars-1.0.0.beta.6.js headless-ember.js ember-prod.js}
+        else              %w{handlebars.js precompiler.js}
+        end.map do |name|
           File.read(File.expand_path("../../../../vendor/javascripts/#{name}", __FILE__))
         end.join("\n")
       end
