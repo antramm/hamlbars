@@ -31,6 +31,12 @@ module Haml
         end
         attributes.delete(:events)
 
+        # This could be generalized into /_.*/ catch-all syntax, if
+        # necessary. https://github.com/jamesotron/hamlbars/pull/33
+        if action = attributes.delete('_action')
+          handlebars_rendered_attributes << " {{action #{action}}}"
+        end
+
         (handlebars_rendered_attributes * '') +
           build_attributes_without_handlebars_attributes(is_html, attr_wrapper, escape_attrs, attributes)
       end
